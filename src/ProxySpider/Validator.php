@@ -33,6 +33,8 @@ class Validator
      */
     private function initializeRequests(array $proxies)
     {
+        $this->requests = [];
+
         foreach ($proxies as $proxy) {
             $ch = curl_init($this->testUrl);
             curl_setopt_array($ch, [
@@ -84,12 +86,28 @@ class Validator
             $info = curl_getinfo($request['handle']);
 
             if ($content === 'ok') {
-                $this->{'successCallback'}($request['proxy'], $info['total_time']);
+                call_user_func($this->successCallback, $request['proxy'], $info['total_time']);
             } else {
-                $this->{'failureCallback'}($request['proxy']);
+                call_user_func($this->failureCallback, $request['proxy']);
             }
 
             curl_multi_remove_handle($this->handle, $request['handle']);
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
     }
 }

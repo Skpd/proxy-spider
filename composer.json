@@ -1,7 +1,14 @@
 {
+  "autoload": {
+    "psr-0": {
+      "ProxySpider": "src"
+    }
+  },
   "require": {
     "php": ">=5.4.0",
     "doctrine/orm": "2.5.0",
-    "psr/log": "1.0.0"
+    "psr/log": "1.0.0",
+    "guzzlehttp/guzzle": "^5.2",
+    "codeception/codeception": "^2.1"
   }
 }

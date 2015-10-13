@@ -1,6 +1,0 @@
-<?php
-
-return [
-    'search-engine-id' => 'Search engine ID. You can find the engine\'s ID in the Setup > Basics > Details section of the Control Panel.',
-    'api-key' => 'Custom Search Engine (free edition) users can obtain the key from the Google Developers Console.'
-];
