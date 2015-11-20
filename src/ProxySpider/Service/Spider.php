@@ -61,7 +61,7 @@ class Spider
     public function markAsGood(Proxy $proxy, $time)
     {
         $this->logger->debug("Proxy #{$proxy->getId()} - $time");
-        $proxy->setPing((int)$time * 1000);
+        $proxy->setPing((int)($time * 1000));
         $this->repo->save($proxy);
     }
 
