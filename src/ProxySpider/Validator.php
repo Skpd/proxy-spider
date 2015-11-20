@@ -2,34 +2,36 @@
 
 namespace ProxySpider;
 
+use ProxySpider\Entity\Proxy;
+
 class Validator
 {
     private $handle;
     private $requests = [];
-    private $successCallback;
-    private $failureCallback;
 
     private $timeout = 10;
     private $testUrl;
 
-    public function __construct(callable $successCallback, callable $failureCallback, $testUrl)
+    public function __construct($testUrl)
     {
-        $this->successCallback = $successCallback;
-        $this->failureCallback = $failureCallback;
         $this->testUrl = $testUrl;
-
         $this->handle = curl_multi_init();
     }
 
-    public function validate(array $proxies)
+    /**
+     * @param Proxy[] $proxies
+     * @param callable $successCallback
+     * @param callable $failureCallback
+     */
+    public function validate(array $proxies, callable $successCallback, callable $failureCallback)
     {
         $this->initializeRequests($proxies);
         $this->runRequests();
-        $this->processRequests();
+        $this->processRequests($successCallback, $failureCallback);
     }
 
     /**
-     * @param array $proxies
+     * @param Proxy[] $proxies
      */
     private function initializeRequests(array $proxies)
     {
@@ -42,7 +44,7 @@ class Validator
                 CURLOPT_CONNECTTIMEOUT => $this->timeout,
                 CURLOPT_TIMEOUT => $this->timeout,
                 CURLOPT_POSTFIELDS => 'foo=bar',
-                CURLOPT_PROXY => $proxy,
+                CURLOPT_PROXY => $proxy->getIp() . ':' . $proxy->getPort(),
                 CURLOPT_RETURNTRANSFER => true
             ]);
 
@@ -79,16 +81,16 @@ class Validator
         }
     }
 
-    private function processRequests()
+    private function processRequests(callable $successCallback, callable $failureCallback)
     {
         foreach ($this->requests as $request) {
             $content = curl_multi_getcontent($request['handle']);
             $info = curl_getinfo($request['handle']);
 
-            if ($content === 'ok') {
-                call_user_func($this->successCallback, $request['proxy'], $info['total_time']);
+            if ($info['http_code'] == 200 && $content === 'ok') {
+                call_user_func($successCallback, $request['proxy'], $info['total_time']);
             } else {
-                call_user_func($this->failureCallback, $request['proxy']);
+                call_user_func($failureCallback, $request['proxy']);
             }
 
             curl_multi_remove_handle($this->handle, $request['handle']);
