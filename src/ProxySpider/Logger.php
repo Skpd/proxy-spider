@@ -24,11 +24,17 @@ class Logger extends AbstractLogger
      */
     public function log($level, $message, array $context = array())
     {
+        if (!empty($context)) {
+            $contextString = ' [' . implode(':', $context) . ']';
+        } else {
+            $contextString = '';
+        }
+
         $this->destination->fwrite(
             date(DATE_ATOM)
             . " ($level) "
             . $message
-            . ' [' . implode(':', $context) . ']'
+            . $contextString
             . PHP_EOL
         );
     }
