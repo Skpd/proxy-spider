@@ -3,6 +3,7 @@
 namespace ProxySpider\Service;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use ProxySpider\Entity\Proxy;
 use ProxySpider\Repository\Proxy as ProxyRepository;
 use ProxySpider\Spider\Text;
 use ProxySpider\Validator;
@@ -55,5 +56,18 @@ class Spider
         $this->logger->debug('Starting Validation.');
         $this->validator->validate($proxies, [$this, 'markAsGood'], [$this, 'markAsBad']);
         $this->logger->debug('We are done.');
+    }
+
+    public function markAsGood(Proxy $proxy, $time)
+    {
+        $this->logger->debug("Proxy #{$proxy->getId()} - $time");
+        $proxy->setPing((int)$time * 1000);
+        $this->repo->save($proxy);
+    }
+
+    public function markAsBad(Proxy $proxy)
+    {
+        $proxy->setPing(null);
+        $this->repo->save($proxy);
     }
 }

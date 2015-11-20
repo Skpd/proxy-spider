@@ -41,4 +41,10 @@ class Proxy extends EntityRepository
 
         $this->_em->flush();
     }
+
+    public function save(\ProxySpider\Entity\Proxy $proxy)
+    {
+        $this->_em->persist($proxy);
+        $this->_em->flush($proxy);
+    }
 }
