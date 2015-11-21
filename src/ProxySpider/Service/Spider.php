@@ -48,20 +48,21 @@ class Spider
 
     public function refreshProxies()
     {
-        $this->logger->debug('Getting proxies for refresh.');
+        $this->logger->info('Getting proxies for refresh.');
         $proxies = $this->repo->getForRefresh();
 
         $this->logger->debug('Found ' . count($proxies) . ' proxies.');
 
-        $this->logger->debug('Starting Validation.');
+        $this->logger->info('Starting Validation.');
         $this->validator->validate($proxies, [$this, 'markAsGood'], [$this, 'markAsBad']);
-        $this->logger->debug('We are done.');
+        $this->logger->info('We are done.');
     }
 
     public function markAsGood(Proxy $proxy, $time)
     {
         $this->logger->debug("Proxy #{$proxy->getId()} - $time");
         $proxy->setPing((int)($time * 1000));
+        $proxy->setPostEnabled(true);
         $this->repo->save($proxy);
     }
 
