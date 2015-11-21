@@ -12,7 +12,7 @@ $config = Setup::createAnnotationMetadataConfiguration($paths);
 $entityManager = EntityManager::create($dbParams, $config);
 
 $logger = new \ProxySpider\Logger(new SplFileObject('php://output'));
-$validator = new \ProxySpider\Validator('spider.dev0.in/check.php');
+$validator = new \ProxySpider\Validator('spider.dev0.in/check.php', $logger);
 
 $service = new \ProxySpider\Service\Spider(
     $entityManager->getRepository('ProxySpider\Entity\Proxy'),
@@ -25,7 +25,7 @@ $service->gather('http://txt.proxyspy.net/proxy.txt');
 
 $logger->info('Looking for Google results');
 $baseUrl = 'https://ajax.googleapis.com/ajax/services/search/web?v=1.1&q=';
-$searchTerm = 'inurl:txt+%2B:8888+%2B:3128';
+$searchTerm = 'inurl:txt+%2B:8888+%2B:3128+%2B:8080+%2B:8081';
 $contents = file_get_contents($baseUrl . $searchTerm);
 $json = json_decode($contents, true);
 if (!empty($json) && $json['responseStatus'] === 200) {

@@ -12,7 +12,7 @@ $config = Setup::createAnnotationMetadataConfiguration($paths);
 $entityManager = EntityManager::create($dbParams, $config);
 
 $logger = new \ProxySpider\Logger(new SplFileObject('php://output'));
-$validator = new \ProxySpider\Validator('spider.dev0.in/check.php');
+$validator = new \ProxySpider\Validator('spider.dev0.in/check.php', $logger);
 
 $service = new \ProxySpider\Service\Spider(
     $entityManager->getRepository('ProxySpider\Entity\Proxy'),

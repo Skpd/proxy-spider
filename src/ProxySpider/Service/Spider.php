@@ -7,12 +7,14 @@ use ProxySpider\Entity\Proxy;
 use ProxySpider\Repository\Proxy as ProxyRepository;
 use ProxySpider\Spider\Text;
 use ProxySpider\Validator;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
-class Spider
+class Spider implements LoggerAwareInterface
 {
-    /** @var LoggerInterface */
-    private $logger;
+    use LoggerAwareTrait;
+
     /** @var ProxyRepository */
     private $repo;
     /** @var Validator */

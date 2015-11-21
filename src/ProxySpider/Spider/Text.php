@@ -3,15 +3,17 @@
 namespace ProxySpider\Spider;
 
 use ProxySpider\Entity\Proxy;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class Text
+class Text implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     const IP_REGEX = '(?:^|\D)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})';
     const PORT_REGEX = '([0-9]{2,5})(?:$|\D)';
-    /** @var LoggerInterface */
-    private $logger;
 
     function __construct(LoggerInterface $logger)
     {
@@ -55,23 +57,5 @@ class Text
         }
 
         return $proxies;
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    public function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     * @return Text
-     */
-    public function setLogger($logger)
-    {
-        $this->logger = $logger;
-        return $this;
     }
 }

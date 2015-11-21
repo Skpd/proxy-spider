@@ -3,19 +3,25 @@
 namespace ProxySpider;
 
 use ProxySpider\Entity\Proxy;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
-class Validator
+class Validator implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private $handle;
     private $requests = [];
 
     private $timeout = 10;
     private $testUrl;
 
-    public function __construct($testUrl)
+    public function __construct($testUrl, LoggerInterface $logger)
     {
         $this->testUrl = $testUrl;
         $this->handle = curl_multi_init();
+        $this->logger = $logger;
     }
 
     /**
@@ -25,9 +31,17 @@ class Validator
      */
     public function validate(array $proxies, callable $successCallback, callable $failureCallback)
     {
-        $this->initializeRequests($proxies);
-        $this->runRequests();
-        $this->processRequests($successCallback, $failureCallback);
+        $limit = 100;
+        $batches = ceil(count($proxies) / $limit);
+
+        $this->logger->debug("Splitting into $batches batches.");
+
+        for ($i = 0; $i < $batches; $i++) {
+            $this->logger->debug('Batch ' . ($i + 1) . "/$batches");
+            $this->initializeRequests(array_slice($proxies, $i * $limit, $limit, true));
+            $this->runRequests();
+            $this->processRequests($successCallback, $failureCallback);
+        }
     }
 
     /**
