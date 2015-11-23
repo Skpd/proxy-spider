@@ -4,11 +4,11 @@ namespace ProxySpider\Entity;
 
 use DateTime;
 use DateTimeZone;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity(repositoryClass="ProxySpider\Repository\Proxy")
- * @Table(name="proxies")
+ * @Table(name="proxies", indexes={@Index(name="ping_idx", columns={"ping"})})
  */
 class Proxy
 {
@@ -69,6 +69,7 @@ class Proxy
      * @var int
      *
      * @Column(type="integer", nullable=true)
+     * @Index
      */
     private $ping;
 
@@ -86,6 +87,12 @@ class Proxy
      */
     private $postEnabled;
 
+    /**
+     * @var ArrayCollection|ValidationLog[]
+     *
+     * @OneToMany(targetEntity="ValidationLog", mappedBy="proxy", cascade="persist")
+     */
+    private $validationLogs;
     #endregion
 
     public function __construct()
@@ -93,6 +100,7 @@ class Proxy
         $this->created = new DateTime('now', new DateTimeZone('UTC'));
         $this->updated = new DateTime('now', new DateTimeZone('UTC'));
         $this->seen = new DateTime('now', new DateTimeZone('UTC'));
+        $this->validationLogs = new ArrayCollection();
     }
 
     #region getters / setters
@@ -254,6 +262,22 @@ class Proxy
     public function setSeen($seen)
     {
         $this->seen = $seen;
+    }
+
+    /**
+     * @return ArrayCollection|ValidationLog[]
+     */
+    public function getValidationLogs()
+    {
+        return $this->validationLogs;
+    }
+
+    /**
+     * @param ArrayCollection|ValidationLog[] $validationLogs
+     */
+    public function setValidationLogs($validationLogs)
+    {
+        $this->validationLogs = $validationLogs;
     }
     #endregion
 }

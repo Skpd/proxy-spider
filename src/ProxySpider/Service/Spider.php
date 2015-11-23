@@ -4,6 +4,7 @@ namespace ProxySpider\Service;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use ProxySpider\Entity\Proxy;
+use ProxySpider\Entity\ValidationLog;
 use ProxySpider\Repository\Proxy as ProxyRepository;
 use ProxySpider\Spider\Text;
 use ProxySpider\Validator;
@@ -63,14 +64,30 @@ class Spider implements LoggerAwareInterface
     public function markAsGood(Proxy $proxy, $time)
     {
         $this->logger->debug("Proxy #{$proxy->getId()} - $time");
+
         $proxy->setPing((int)($time * 1000));
         $proxy->setPostEnabled(true);
+
+        $log = new ValidationLog();
+        $log->setProxy($proxy);
+        $log->setResponseTime($proxy->getPing());
+        $log->setStatus(ValidationLog::STATUS_OK);
+
+        $proxy->getValidationLogs()->add($log);
         $this->repo->save($proxy);
     }
 
     public function markAsBad(Proxy $proxy)
     {
         $proxy->setPing(null);
+
+        $log = new ValidationLog();
+        $log->setProxy($proxy);
+        $log->setResponseTime($this->validator->getTimeout() * 1000);
+        $log->setStatus(ValidationLog::STATUS_BAD);
+
+        $proxy->getValidationLogs()->add($log);
+
         $this->repo->save($proxy);
     }
 }
