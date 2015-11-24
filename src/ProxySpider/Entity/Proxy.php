@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity(repositoryClass="ProxySpider\Repository\Proxy")
- * @Table(name="proxies", indexes={@Index(name="search_idx", columns={"ip", "port"})})
+ * @Table(name="proxies", uniqueConstraints={@UniqueConstraint(name="search_idx", columns={"ip", "port"})})
  */
 class Proxy
 {
