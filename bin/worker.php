@@ -20,4 +20,21 @@ $service = new \ProxySpider\Service\Spider(
     $validator
 );
 
-$service->refreshProxies(true);
+$worker = new GearmanWorker();
+$worker->addServer();
+
+$worker->addFunction('spider.validate.proxies', function (GearmanJob $job) use ($service, $validator, $logger, $entityManager) {
+    $logger->debug("Received job {$job->unique()}");
+    $proxies = unserialize($job->workload());
+
+    foreach ($proxies as &$proxy) {
+        $proxy = $entityManager->merge($proxy);
+    }
+
+    $validator->setTimeout(2);
+    $validator->validate($proxies, [$service, 'markAsGood'], [$service, 'markAsBad']);
+
+    $logger->debug("{$job->unique()} done");
+});
+
+while ($worker->work()) ;

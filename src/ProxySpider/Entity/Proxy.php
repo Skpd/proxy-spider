@@ -89,7 +89,7 @@ class Proxy
     /**
      * @var ArrayCollection|ValidationLog[]
      *
-     * @OneToMany(targetEntity="ValidationLog", mappedBy="proxy", cascade="persist")
+     * @OneToMany(targetEntity="ValidationLog", mappedBy="proxy")
      */
     private $validationLogs;
     #endregion

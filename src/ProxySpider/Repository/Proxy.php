@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\OptimisticLockException;
+use ProxySpider\Entity\ValidationLog;
 
 /**
  * Proxy
@@ -51,9 +52,14 @@ class Proxy extends EntityRepository
         }
     }
 
-    public function save(\ProxySpider\Entity\Proxy $proxy)
+    public function save(\ProxySpider\Entity\Proxy $proxy, ValidationLog $log = null)
     {
         $this->_em->persist($proxy);
-        $this->_em->flush($proxy);
+
+        if ($log !== null) {
+            $this->_em->persist($log);
+        }
+
+        $this->_em->flush();
     }
 }

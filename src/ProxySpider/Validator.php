@@ -31,17 +31,9 @@ class Validator implements LoggerAwareInterface
      */
     public function validate(array $proxies, callable $successCallback, callable $failureCallback)
     {
-        $limit = 100;
-        $batches = ceil(count($proxies) / $limit);
-
-        $this->logger->debug("Splitting into $batches batches.");
-
-        for ($i = 0; $i < $batches; $i++) {
-            $this->logger->debug('Batch ' . ($i + 1) . "/$batches");
-            $this->initializeRequests(array_slice($proxies, $i * $limit, $limit, true));
-            $this->runRequests();
-            $this->processRequests($successCallback, $failureCallback);
-        }
+        $this->initializeRequests($proxies);
+        $this->runRequests();
+        $this->processRequests($successCallback, $failureCallback);
     }
 
     /**

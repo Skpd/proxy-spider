@@ -48,7 +48,7 @@ class ValidationLog
     /**
      * @var Proxy
      *
-     * @ManyToOne(targetEntity="Proxy", inversedBy="validationLogs", cascade={"persist"})
+     * @ManyToOne(targetEntity="Proxy", inversedBy="validationLogs")
      */
     private $proxy;
 

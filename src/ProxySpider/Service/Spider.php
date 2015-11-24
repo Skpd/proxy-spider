@@ -56,7 +56,7 @@ class Spider implements LoggerAwareInterface
         }
     }
 
-    public function refreshProxies()
+    public function refreshProxies($parallel = false)
     {
         $this->logger->info('Getting proxies for refresh.');
         $proxies = $this->repo->getForRefresh();
@@ -64,7 +64,43 @@ class Spider implements LoggerAwareInterface
         $this->logger->debug('Found ' . count($proxies) . ' proxies.');
 
         $this->logger->info('Starting Validation.');
-        $this->validator->validate($proxies, [$this, 'markAsGood'], [$this, 'markAsBad']);
+
+        $gearman = null;
+
+        if ($parallel) {
+            $gearman = new \GearmanClient();
+            $gearman->addServer();
+
+            $logger = $this->logger;
+
+            $gearman->setCompleteCallback(function (\GearmanTask $task) use ($logger) {
+                $logger->debug($task->functionName() . ':' . $task->unique() . ' done.');
+            });
+        }
+
+        $limit = 10;
+        $batches = ceil(count($proxies) / $limit);
+
+        $this->logger->debug("Splitting into $batches batches.");
+
+        for ($i = 0; $i < $batches; $i++) {
+            if ($parallel) {
+                $gearman->addTask('spider.validate.proxies', serialize(array_slice($proxies, $i * $limit, $limit, true)));
+            } else {
+                $this->logger->debug('Batch ' . ($i + 1) . "/$batches");
+                $this->validator->validate(
+                    array_slice($proxies, $i * $limit, $limit, true),
+                    [$this, 'markAsGood'],
+                    [$this, 'markAsBad']
+                );
+            }
+        }
+
+        if ($parallel) {
+            $gearman->runTasks();
+        }
+
+
         $this->logger->info('We are done.');
     }
 
@@ -95,6 +131,6 @@ class Spider implements LoggerAwareInterface
 
         $proxy->getValidationLogs()->add($log);
 
-        $this->repo->save($proxy);
+        $this->repo->save($proxy, $log);
     }
 }
