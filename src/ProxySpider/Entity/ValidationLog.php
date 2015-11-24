@@ -7,7 +7,7 @@ use DateTimeZone;
 
 /**
  * @Entity()
- * @Table(name="validation_logs")
+ * @Table(name="validation_logs", indexes={@Index(name="rtime_idx", columns={"responseTime"})})
  */
 class ValidationLog
 {

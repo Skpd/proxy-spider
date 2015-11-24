@@ -5,6 +5,7 @@ namespace ProxySpider\Repository;
 use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\OptimisticLockException;
 
 /**
  * Proxy
@@ -24,6 +25,8 @@ class Proxy extends EntityRepository
 
     /**
      * @param \ProxySpider\Entity\Proxy[] $proxies
+     * @throws OptimisticLockException
+     * @throws \Exception
      */
     public function saveAll(array $proxies)
     {
@@ -37,9 +40,15 @@ class Proxy extends EntityRepository
                 $existing->setSeen(new DateTime('now', new DateTimeZone('UTC')));
                 $this->_em->persist($existing);
             }
-        }
 
-        $this->_em->flush();
+            try {
+                $this->_em->flush();
+            } catch (OptimisticLockException $e) {
+                throw $e;
+            } finally {
+                $this->_em->clear();
+            }
+        }
     }
 
     public function save(\ProxySpider\Entity\Proxy $proxy)

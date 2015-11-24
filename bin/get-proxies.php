@@ -36,7 +36,11 @@ if (preg_match_all("#href='([^']+)'#i", $response->getBody()->getContents(), $m)
 
     foreach ($m[1] as $link) {
         $logger->debug("Loading $link");
-        $service->gather("http://orcahub.com/proxy-list/$link");
+        $response = $client->get("http://orcahub.com/proxy-list/$link");
+        $filename = sys_get_temp_dir() . '/orcahub_' . uniqid();
+        file_put_contents($filename, $response->getBody()->getContents());
+        $service->gather($filename);
+        unlink($filename);
     }
 }
 

@@ -3,6 +3,7 @@
 namespace ProxySpider\Service;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\OptimisticLockException;
 use ProxySpider\Entity\Proxy;
 use ProxySpider\Entity\ValidationLog;
 use ProxySpider\Repository\Proxy as ProxyRepository;
@@ -33,20 +34,26 @@ class Spider implements LoggerAwareInterface
         $this->validator = $validator;
     }
 
-    public function gather($url)
+    public function gather($urlOrPath)
     {
         $spider = new Text($this->logger);
-        $this->logger->debug('Parsing source');
+        $this->logger->debug("Parsing source $urlOrPath");
 
         try {
-            $proxies = $spider->grabIt($url);
+            $proxies = $spider->grabIt($urlOrPath);
         } catch (\RuntimeException $e) {
             $this->logger->critical('Failed to process');
             return;
         }
 
         $this->logger->debug('Got ' . count($proxies) . ' proxies');
-        $this->repo->saveAll($proxies);
+
+        try {
+            $this->repo->saveAll($proxies);
+        } catch (OptimisticLockException $e) {
+            $this->logger->critical("Lock failed, try to apply changes again.");
+            throw $e;
+        }
     }
 
     public function refreshProxies()

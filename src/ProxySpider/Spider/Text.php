@@ -20,12 +20,12 @@ class Text implements LoggerAwareInterface
         $this->logger = $logger;
     }
 
-    public function grabIt($url)
+    public function grabIt($urlOrPath)
     {
         try {
-            $source = new \SplFileObject($url);
+            $source = new \SplFileObject($urlOrPath);
         } catch (RuntimeException $e) {
-            $this->logger->alert("Failed to open URL '$url'", [$e->getMessage()]);
+            $this->logger->alert("Failed to open URL '$urlOrPath'", [$e->getMessage()]);
             throw $e;
         }
 

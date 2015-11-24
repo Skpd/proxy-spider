@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity(repositoryClass="ProxySpider\Repository\Proxy")
- * @Table(name="proxies", indexes={@Index(name="ping_idx", columns={"ping"})})
+ * @Table(name="proxies", indexes={@Index(name="search_idx", columns={"ip", "port"})})
  */
 class Proxy
 {
@@ -54,7 +54,6 @@ class Proxy
      * @var DateTime
      *
      * @Column(type="datetime", nullable=false)
-     * @Version
      */
     private $updated;
 
