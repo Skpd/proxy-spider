@@ -25,7 +25,7 @@ class Text implements LoggerAwareInterface
         try {
             $source = new \SplFileObject($url);
         } catch (RuntimeException $e) {
-            $this->logger->alert("Failed to open URL '$url'");
+            $this->logger->alert("Failed to open URL '$url'", [$e->getMessage()]);
             throw $e;
         }
 
