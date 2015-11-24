@@ -7,7 +7,7 @@ use Doctrine\ORM\Tools\Setup;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $paths = ["src/ProxySpider/Entity"];
-$dbParams = include __DIR__ . '/../config/db.php';
+$dbParams = include __DIR__ . '/../config/db.local.php';
 $config = Setup::createAnnotationMetadataConfiguration($paths);
 $entityManager = EntityManager::create($dbParams, $config);
 

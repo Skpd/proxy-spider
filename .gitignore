@@ -56,7 +56,7 @@ vendor/
 
 ### Other
 
-config/*.php
+config/*.local.php
 
 
 tests/_output/*
