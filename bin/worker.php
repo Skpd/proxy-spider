@@ -31,7 +31,7 @@ $worker->addFunction('spider.validate.proxies', function (GearmanJob $job) use (
         $proxy = $entityManager->merge($proxy);
     }
 
-    $validator->setTimeout(2);
+    $validator->setTimeout(3);
     $validator->validate($proxies, [$service, 'markAsGood'], [$service, 'markAsBad']);
 
     $logger->debug("{$job->unique()} done");

@@ -117,7 +117,7 @@ class Spider implements LoggerAwareInterface
         $log->setStatus(ValidationLog::STATUS_OK);
 
         $proxy->getValidationLogs()->add($log);
-        $this->repo->save($proxy);
+        $this->repo->save($proxy, $log);
     }
 
     public function markAsBad(Proxy $proxy)
