@@ -19,7 +19,7 @@ class Proxy extends EntityRepository
      */
     public function getForRefresh()
     {
-        $result = $this->findAll();
+        $result = $this->findBy([], ['updated' => 'asc'], 1000);
 
         return $result;
     }

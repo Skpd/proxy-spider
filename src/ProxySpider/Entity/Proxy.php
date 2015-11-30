@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @Entity(repositoryClass="ProxySpider\Repository\Proxy")
  * @Table(name="proxies", uniqueConstraints={@UniqueConstraint(name="search_idx", columns={"ip", "port"})})
+ * @HasLifecycleCallbacks
  */
 class Proxy
 {
@@ -100,6 +101,12 @@ class Proxy
         $this->updated = new DateTime('now', new DateTimeZone('UTC'));
         $this->seen = new DateTime('now', new DateTimeZone('UTC'));
         $this->validationLogs = new ArrayCollection();
+    }
+
+    /** @PreUpdate */
+    public function updateTimestamp()
+    {
+        $this->updated = new DateTime('now', new DateTimeZone('UTC'));
     }
 
     #region getters / setters
